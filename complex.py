@@ -99,40 +99,6 @@ def main(_):
         ))
 
 
-
-def get_m(p_r, n, c, k):
-    pass
-
-def get_m_r(p_r, n, c, k):
-    if k == 0:
-        return p_r / (n + c)
-
-    return -1 * (n + c) / (2 * k) + tf.sqrt(
-        tf.square(
-            (n + c) / (2 * k)
-        )
-        +
-        p_r / k
-    )
-
-def get_m_c(p_r, n, c, k):
-    if k == 0:
-        return p_r / (2 * (n + c))
-
-    return -1 * (n + c) / (2 * k) + tf.sqrt(
-        tf.square(
-            (n + c) / (2 * k)
-        )
-        +
-        p_r / (2 * k)
-    )
-
-def get_p_r(n,m):
-    return 2*(n*m) + 2*m
-
-def get_p_c(n,m):
-    return n*m + m
-
 def weight_complex_variable(shape):
     real = tf.truncated_normal(shape, stddev=0.1)
     imaginary = tf.truncated_normal(shape, stddev=0.1)
