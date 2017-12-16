@@ -2,12 +2,20 @@ import keras
 from keras.datasets import mnist, cifar10, cifar100
 from keras import backend as K
 
+example_size = 1000000
 def get_mnist_data():
     data = {
         "output_shape": 10,
     }
 
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+    x_train = x_train[:example_size]
+    y_train = y_train[:example_size]
+
+    x_test = x_test[:example_size]
+    y_test = y_test[:example_size]
+
 
     img_rows = 28
     img_cols = 28
@@ -53,6 +61,13 @@ def get_cifar10_data():
 
     # The data, shuffled and split between train and test sets:
     (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+
+    x_train = x_train[:example_size]
+    y_train = y_train[:example_size]
+
+    x_test = x_test[:example_size]
+    y_test = y_test[:example_size]
+
     print('x_train shape:', x_train.shape)
     print(x_train.shape[0], 'train samples')
     print(x_test.shape[0], 'test samples')
@@ -85,6 +100,13 @@ def get_cifar100_data():
 
     # The data, shuffled and split between train and test sets:
     (x_train, y_train), (x_test, y_test) = cifar100.load_data()
+
+    x_train = x_train[:example_size]
+    y_train = y_train[:example_size]
+
+    x_test = x_test[:example_size]
+    y_test = y_test[:example_size]
+
     print('x_train shape:', x_train.shape)
     print(x_train.shape[0], 'train samples')
     print(x_test.shape[0], 'test samples')

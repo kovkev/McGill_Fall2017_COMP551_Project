@@ -30,25 +30,29 @@ budgets = [
 ]
 
 tasks = {
-    "mnist": data.get_mnist_data,
-    "cifar10": data.get_cifar10_data,
+    # "cifar10": data.get_cifar10_data,
     "cifar100": data.get_cifar100_data,
+    # "mnist": data.get_mnist_data,
 }
 
 import itertools
-products = itertools.product(
+products = list(itertools.product(
     budgets,
     ks,
     activation_functions,
     loss_functions,
     data_augmentations,
-)
+))
 
 for task_name, get_task_data in tasks.items():
     print(get_task_data)
     data = get_task_data()
+    print(task_name)
+    print("GET!")
 
     for product in products:
+        print(task_name)
+        print(product)
         cifar10_cnn.test_task(
             task_name,
             data,

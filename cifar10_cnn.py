@@ -13,6 +13,7 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras.callbacks import ModelCheckpoint
 import os
 import re
+import numpy as np
 
 batch_size = 32
 num_classes = 10
@@ -69,7 +70,9 @@ def generate_model(
         model.add(layer)
         model.add(Activation(activation))
 
-    model.add(Dense(num_classes))
+    last_layer = num_classes
+    last_layer = data_shape["y_train_size"]
+    model.add(Dense(last_layer))
     model.add(Activation('softmax'))
 
     start_epoch = try_to_load_weights(
@@ -88,7 +91,7 @@ def try_to_load_weights(
     path = ["weights", task_name, dirdir]
     from os import listdir
     from os.path import isfile, join
-    weight_files = [f for f in listdir(join(*path)) if isfile(join(*path, f))]
+    weight_files = [f for f in listdir(join(*path)) if isfile(join(*(path + [f])))]
     weight_files = list(reversed(sorted(weight_files)))
 
     if len(weight_files) > 0:
@@ -166,6 +169,7 @@ def test_task(
         {
             "input_shape": data["input_shape"],
             "output_shape": data["output_shape"],
+            "y_train_size": data["y_train"][0].size,
         },
         num_hidden_layers,
         budget,
@@ -200,7 +204,7 @@ def test_task(
     class LossHistory(keras.callbacks.Callback):
         def __init__(self, fullpath):
             self.fullpath = fullpath
-            super()
+            super(LossHistory, self)
 
         def on_train_begin(self, logs={}):
             self.losses = []
@@ -226,19 +230,41 @@ def test_task(
 
     callbacks_list = [mcp, history]
 
+    # import pdb; pdb.set_trace()
     if not data_augmentation:
+        # import pdb; pdb.set_trace()
+        # for i in range(epochs_done, epochs):
+
         print('Not using data augmentation.')
-        model.fit(
-            data["x_train"],
-            data["y_train"],
-            batch_size=batch_size,
+        def fitGenerator():
+
+            while 1:
+                how_many_train = 50
+                how_many_test = 50
+                num_train = data["x_train"].shape[0]
+                num_test = data["x_test"].shape[0]
+                nums_to_train = np.arange(num_train)
+                nums_to_test = np.arange(num_test)
+                np.random.shuffle(nums_to_train)
+                np.random.shuffle(nums_to_test)
+                nums_to_train = nums_to_train[:how_many_train]
+                nums_to_test = nums_to_test[:how_many_test]
+
+                yield data["x_train"][nums_to_train], data["y_train"][nums_to_train]
+
+        model.fit_generator(
+            fitGenerator(),
+            # data["x_train"][nums_to_train],
+            # data["y_train"][nums_to_train],
+            # batch_size=batch_size,
             epochs=epochs,
-            initial_epoch=epochs_done,
+            samples_per_epoch=100,
+            verbose=2,
+            initial_epoch=min(epochs_done, 95),
             validation_data=(
-                data["x_test"],
-                data["y_test"],
+                data["x_test"][:5000],
+                data["y_test"][:5000],
             ),
-            shuffle=True,
             callbacks=callbacks_list,
         )
     else:
